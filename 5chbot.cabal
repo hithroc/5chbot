@@ -22,4 +22,6 @@ executable 5chbot
                       ,transformers
                       ,aeson
                       ,bytestring
+                      ,cassava
+                      ,vector
   default-extensions:  OverloadedStrings

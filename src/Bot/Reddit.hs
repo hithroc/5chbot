@@ -10,6 +10,7 @@ import Data.Maybe
 import Control.Concurrent
 import qualified Data.Text as Text
 import qualified Data.Text.IO as Text
+import Bot.Csv
 
 data Command 
   = Broadcast Text.Text Text.Text
@@ -25,8 +26,8 @@ parseCommand msg = case listToMaybe (Text.words . body $ msg) of
 
 execute :: (Monad m, MonadIO m) => Command -> RedditT m ()
 execute (Broadcast topic message) = do
-  let users = [Username "hithroc", Username "AnonymousHithroc"]
-  broadcast users topic message
+  users <- liftIO $ loadUsers "maillist.csv"
+  broadcast (map Username users) topic message
 execute (Echo u msg) = sendMessage u "Echo" msg
 execute _ = return ()
 
