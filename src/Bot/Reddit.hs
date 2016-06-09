@@ -12,7 +12,7 @@ import qualified Data.Text as Text
 import qualified Data.Text.IO as Text
 import Bot.Csv
 
-data Command 
+data Command
   = Broadcast Text.Text Text.Text
   | Echo Username Text.Text
   deriving Show
@@ -26,7 +26,7 @@ parseCommand msg = case listToMaybe (Text.words . body $ msg) of
 
 execute :: (Monad m, MonadIO m) => Command -> RedditT m ()
 execute (Broadcast topic message) = do
-  users <- liftIO $ loadUsers "maillist.csv"
+  (Just users) <- liftIO $ loadUsers "maillist.csv"
   broadcast (map Username users) topic message
 execute (Echo u msg) = sendMessage u "Echo" msg
 execute _ = return ()
@@ -40,7 +40,7 @@ redditMain = do
   redditLoop mods
 
 redditGetMods :: Monad m => RedditT m ([Username])
-redditGetMods = return [Username "hithroc", Username "AnonymousHithroc"] -- For now
+redditGetMods = return . map Username $ ["hithroc", "AnonymousHithroc", "iceman012"] -- For now
 
 redditLoop :: (Monad m, MonadIO m) => [Username] -> RedditT m ()
 redditLoop mods = do

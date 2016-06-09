@@ -14,7 +14,7 @@ main :: IO ()
 main = do
   (Just cfg) <- loadConfig "config.json"
   print cfg
-  res <- runReddit (userName cfg) (password cfg) (execute $ Broadcast "test" "test")
+  res <- runReddit (userName cfg) (password cfg) redditMain
   print res
 
 tshow :: Show a => a -> Text.Text
