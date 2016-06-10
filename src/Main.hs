@@ -12,7 +12,7 @@ import Bot.Reddit
 
 main :: IO ()
 main = do
-  (Just mcfg) <- loadConfig "config.json"
+  mcfg <- loadConfig "config.json"
   case mcfg of
     Nothing -> putStrLn "Error: Failed to open config.json!"
     Just cfg -> do

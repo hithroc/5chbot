@@ -21,8 +21,13 @@ parseMessage msg = eitherToMaybe $ parse pCommand "" (body msg)
     eitherToMaybe (Left _) = Nothing
     eitherToMaybe (Right x) = Just x
 
+authorize :: (Monad m, MonadIO m) => Message -> RedditT m () -> RedditT m ()
+authorize msg m = do
+  mods <- redditGetMods
+  if maybe False (`elem` mods) (from msg) then m else return ()
+
 execute :: (Monad m, MonadIO m) => Message -> Command -> RedditT m ()
-execute msg (Broadcast bcastMsg) = do
+execute msg (Broadcast bcastMsg) = authorize msg $ do
   (Just users) <- liftIO $ loadUsers "maillist.csv"
   broadcast (map Username users) (subject msg) bcastMsg
 execute msg (Echo echoMsg) = maybe (return ()) (\u -> sendMessage u (subject msg) echoMsg) (from msg)
@@ -42,8 +47,8 @@ redditGetMods = return . map Username $ ["hithroc", "AnonymousHithroc", "iceman0
 redditLoop :: (Monad m, MonadIO m) => [Username] -> RedditT m ()
 redditLoop mods = do
   unread <- contents <$> getUnread
-  let msgs = filter (\x -> from x `elem` map Just mods) unread
-      commands = catMaybes . map (\x -> (\y -> (x,y)) <$> parseMessage x) $ msgs
+  let
+    commands = catMaybes . map (\x -> (\y -> (x,y)) <$> parseMessage x) $ unread
   traverse_ markRead . map fst $ commands
   traverse_ (uncurry execute) $ commands
   liftIO $ threadDelay 5000000 -- 5 sec
