@@ -12,9 +12,12 @@ import Bot.Reddit
 
 main :: IO ()
 main = do
-  (Just cfg) <- loadConfig "config.json"
-  res <- runReddit (userName cfg) (password cfg) redditMain
-  print res
+  (Just mcfg) <- loadConfig "config.json"
+  case mcfg of
+    Nothing -> putStrLn "Error: Failed to open config.json!"
+    Just cfg -> do
+      res <- runReddit (userName cfg) (password cfg) redditMain
+      print res
 
 tshow :: Show a => a -> Text.Text
 tshow = Text.pack . show
