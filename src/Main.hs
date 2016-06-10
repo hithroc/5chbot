@@ -13,7 +13,6 @@ import Bot.Reddit
 main :: IO ()
 main = do
   (Just cfg) <- loadConfig "config.json"
-  print cfg
   res <- runReddit (userName cfg) (password cfg) redditMain
   print res
 
