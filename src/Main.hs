@@ -9,14 +9,19 @@ import qualified Data.Text as Text
 import qualified Data.Text.IO as Text
 import Bot.Config
 import Bot.Reddit
+import Bot.Drive
+import qualified Data.ByteString.Lazy.Char8 as BS
+import System.Directory
 
 main :: IO ()
 main = do
+  createDirectoryIfMissing True "data"
   mcfg <- loadConfig "config.json"
   case mcfg of
     Nothing -> putStrLn "Error: Failed to open config.json!"
     Just cfg -> do
-      res <- runReddit (userName cfg) (password cfg) redditMain
+      _ <- initDrive (googleId cfg) (googleSecret cfg) "data/gcache"
+      res <- runReddit (userName cfg) (password cfg) (redditMain cfg)
       print res
 
 tshow :: Show a => a -> Text.Text

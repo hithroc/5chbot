@@ -19,6 +19,8 @@ executable 5chbot
                        Bot.Csv
                        Bot.Config
                        Bot.Parse
+                       Bot.Drive
+                       Bot.Util
   default-language:    Haskell2010
   build-depends:       base >= 4.7 && < 5
                       ,reddit
@@ -29,6 +31,15 @@ executable 5chbot
                       ,cassava
                       ,vector
                       ,parsec
+                      ,google-drive
+                      ,google-oauth2
+                      ,http-conduit
+                      ,http-types
+                      ,conduit
+                      ,unordered-containers
+                      ,lens
+                      ,wreq
+                      ,directory
   default-extensions:  ConstraintKinds
                        DataKinds
                        DefaultSignatures

@@ -1,3 +1,6 @@
 { "username": "example"
-, "password": "12345"
+, "password": "1234567"
+, "google_client_id": ""
+, "google_client_secret": ""
+, "google_maillist_id": ""
 }
