@@ -11,5 +11,6 @@ extra-deps:
 - http-client-tls-0.2.2
 - http-conduit-2.1.9
 - http-types-0.8.6
-- reddit-0.1.0.0
+- reddit-0.2.0.0
+- unordered-containers-0.2.5.1
 resolver: lts-6.2
