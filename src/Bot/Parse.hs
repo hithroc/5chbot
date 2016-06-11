@@ -3,6 +3,7 @@ module Bot.Parse where
 import Text.Parsec
 import Text.Parsec.Prim
 import Text.Parsec.Text
+import Control.Monad
 import qualified Data.Text as Text
 
 data Command
@@ -24,7 +25,7 @@ commands = map (\(x,y) -> (try . pStr $ x , y))
   where
     pStr x = do
       string x
-      space
+      try (void space) <|> eof
       return ()
 
 pContent :: Parser Text.Text
