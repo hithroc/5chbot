@@ -8,6 +8,7 @@ import qualified Data.Text as Text
 data Command
   = Broadcast Text.Text
   | Echo Text.Text
+  | ErrorTest Text.Text
   | Version
   | Help
   deriving Show
@@ -16,7 +17,7 @@ commands :: [(Parser (), Parser Command)]
 commands = map (\(x,y) -> (try . pStr $ x , y))
   [("broadcast", Broadcast <$> pContent)
   ,("echo", Echo <$> pContent)
-  ,("echo123", Echo <$> pContent)
+  ,("error", ErrorTest <$> pContent)
   ,("version", return Version)
   ,("help", return Help)
   ]

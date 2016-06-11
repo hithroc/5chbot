@@ -26,19 +26,30 @@ authorize msg m = do
   mods <- redditGetMods
   if maybe False (`elem` mods) (from msg) then m else return ()
 
+sendError :: (Monad m, MonadIO m) => Config -> Message -> Text.Text -> RedditT m ()
+sendError cfg msg txt = case from msg of
+  Nothing -> return ()
+  Just u -> do
+    let
+      ans = body msg
+          <>"\n\n-------------------\n\n"
+          <>txt
+    sendMessage u "Command error!" ans
+
 execute :: (Monad m, MonadIO m) => Config -> Message -> Command -> RedditT m ()
 execute cfg msg (Broadcast bcastMsg) = authorize msg $ do
   tok <- liftIO $ initDrive (googleId cfg) (googleSecret cfg) "data/gcache"
   res <- liftIO $ downloadSpreadsheet tok (maillistId cfg)
   case res of
-    Left e -> return ()
+    Left e -> sendError cfg msg (Text.pack . show $ e)
     Right b -> do
       muser <- liftIO $ loadUsers b
       case muser of
-        Nothing -> return ()
+        Nothing -> sendError cfg msg "Mailing list parse error!"
         Just users -> do
           liftIO $ print users
           broadcast (map Username users) (subject msg) bcastMsg
+execute cfg msg (ErrorTest errMsg) = authorize msg $ sendError cfg msg errMsg
 execute cfg msg (Echo echoMsg) = maybe (return ()) (\u -> sendMessage u (subject msg) echoMsg) (from msg)
 execute _ _ _ = return ()
 
