@@ -12,6 +12,8 @@ import Data.Maybe
 import Control.Concurrent
 import qualified Data.Text as Text
 import qualified Data.Text.IO as Text
+import qualified Paths_5chbot as P
+import Data.Version (showVersion)
 import Bot.Csv
 import Bot.Parse
 import Bot.Util
@@ -49,8 +51,11 @@ execute cfg msg (Broadcast bcastMsg) = authorize msg $ do
         Just users -> do
           liftIO $ print users
           broadcast (map Username users) (subject msg) bcastMsg
+
 execute cfg msg (ErrorTest errMsg) = authorize msg $ sendError cfg msg errMsg
+
 execute cfg msg (Echo echoMsg) = maybe (return ()) (\u -> sendMessage u (subject msg) echoMsg) (from msg)
+execute cfg msg (Version) = maybe (return ()) (\u -> sendMessage u "Version" (Text.pack $ ("5chbot " ++ showVersion P.version))) (from msg)
 execute _ _ _ = return ()
 
 broadcast :: (Monad m, MonadIO m) => [Username] -> Text.Text -> Text.Text -> RedditT m ()
