@@ -14,7 +14,7 @@ Then, go to the root directory of the project and setup the environment and buil
 
 ## Running
 
-To run the project you need to copy the example config file and place the login information for the there:
+To run the project you need to copy the example config file and fill the login information there:
 
     $ cp config.json.example config.json
 
