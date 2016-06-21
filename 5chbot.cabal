@@ -1,6 +1,6 @@
 name:                5chbot
 version:             0.1.0.0
-synopsis:            Simple project template from stack
+synopsis:            A message broadcasting bot for /r/5cardhearthstone subreddit
 description:         Please see README.md
 homepage:            https://github.com/hithroc/5chbot#readme
 license:             BSD3
