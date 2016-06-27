@@ -7,11 +7,12 @@ import qualified Control.Exception as E
 import qualified Data.ByteString.Lazy as BS
 
 data Config = Config
-  { userName :: Text.Text
-  , password :: Text.Text
-  , googleId :: String
-  , googleSecret :: String
-  , maillistId :: Text.Text
+  { cfgUsername :: Text.Text
+  , cfgPassword :: Text.Text
+  , cfgGoogleId :: String
+  , cfgGoogleSecret :: String
+  , cfgMaillistId :: Text.Text
+  , cfgModerators :: [Text.Text]
   }
   deriving Show
 
@@ -22,6 +23,7 @@ instance FromJSON Config where
     <*> v .: "google_client_id"
     <*> v .: "google_client_secret"
     <*> v .: "google_maillist_id"
+    <*> v .: "moderators"
 
 
 loadConfig :: FilePath -> IO (Maybe Config)

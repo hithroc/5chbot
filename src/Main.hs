@@ -20,8 +20,8 @@ main = do
   case mcfg of
     Nothing -> putStrLn "Error: Failed to open config.json!"
     Just cfg -> do
-      _ <- initDrive (googleId cfg) (googleSecret cfg) "data/gcache"
-      res <- runReddit (userName cfg) (password cfg) (redditMain cfg)
+      _ <- initDrive (cfgGoogleId cfg) (cfgGoogleSecret cfg) "data/gcache"
+      res <- runReddit (cfgUsername cfg) (cfgPassword cfg) (redditMain cfg)
       print res
 
 tshow :: Show a => a -> Text.Text
