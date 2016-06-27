@@ -1,5 +1,6 @@
 .stack-work
 config.json
+google.json
 dist
 *.csv
 data
