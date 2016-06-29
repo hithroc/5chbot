@@ -5,11 +5,8 @@ packages:
 extra-deps:
 - aeson-0.9.0.1
 - api-builder-0.11.0.0
-- google-drive-0.4.1
-- google-oauth2-0.2.1
 - http-client-0.4.20
 - http-client-tls-0.2.2
-- http-conduit-2.1.9
 - http-types-0.8.6
 - reddit-0.2.0.0
 - unordered-containers-0.2.5.1
