@@ -5,6 +5,7 @@ import Reddit.Types.Post
 import Control.Monad
 import Settings
 import System.IO
+import System.Directory
 import System.Environment
 import System.Exit
 import System.Log.Logger
@@ -46,7 +47,9 @@ main = do
       if setDaemonMode set
       then do
         infoM rootLoggerName "Running as a daemon."
+        pwd <- getCurrentDirectory
         daemonize $ do
+          setCurrentDirectory pwd
           pid <- getProcessID
           infoM rootLoggerName $ "PID: " ++ show pid
           go cfg
