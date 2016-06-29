@@ -1,4 +1,4 @@
-module Bot.Reddit where
+module Bot.Core where
 
 import Reddit
 import Reddit.Types.Message
@@ -16,10 +16,12 @@ import System.Directory
 import qualified Data.Text as Text
 import qualified Data.Text.IO as Text
 import qualified Paths_5chbot as P
+import System.Log.Logger
 import Data.Version (showVersion)
 import Bot.Parse
 import Bot.Util
 import Bot.Config
+import Settings
 
 parseMessage :: Message -> Maybe Command
 parseMessage msg = eitherToMaybe $ parse pCommand "" (body msg)
@@ -53,7 +55,7 @@ execute cfg msg (Broadcast bcastMsg) = authorize cfg msg $ do
 execute cfg msg (ErrorTest errMsg) = authorize cfg msg $ sendError cfg msg errMsg
 
 execute cfg msg (Echo echoMsg) = void $ replyMessage msg echoMsg
-execute cfg msg Version = void $ replyMessage msg (Text.pack $ ("5chbot " ++ showVersion P.version))
+execute cfg msg Version = void $ replyMessage msg (Text.pack $ showVersion)
 execute cfg msg Unsubscribe = case from msg of
   Nothing -> return ()
   Just (Username u) -> do
