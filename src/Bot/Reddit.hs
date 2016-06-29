@@ -30,15 +30,13 @@ authorize cfg msg m = do
   if maybe False (`elem` mods) (from msg) then m else return ()
 
 sendError :: (Monad m, MonadIO m) => Config -> Message -> Text.Text -> RedditT m ()
-sendError cfg msg txt = case from msg of
-  Nothing -> return ()
-  Just u -> do
-    let
-      ans = "### Request"
-          <>"\n\n>" <> body msg
-          <>"\n\n-------------------\n\n"
-          <>txt
-    sendMessage u "Command error!" ans
+sendError cfg msg txt = do
+  let
+    ans = "### Request"
+        <>"\n\n>" <> body msg
+        <>"\n\n### Error Message"
+        <>"\n\n>" <> txt
+  void $ replyMessage msg ans
 
 execute :: (Monad m, MonadIO m) => Config -> Message -> Command -> RedditT m ()
 execute cfg msg (Broadcast bcastMsg) = authorize cfg msg $ do
@@ -54,8 +52,8 @@ execute cfg msg (Broadcast bcastMsg) = authorize cfg msg $ do
 
 execute cfg msg (ErrorTest errMsg) = authorize cfg msg $ sendError cfg msg errMsg
 
-execute cfg msg (Echo echoMsg) = maybe (return ()) (\u -> sendMessage u (subject msg) echoMsg) (from msg)
-execute cfg msg Version = maybe (return ()) (\u -> sendMessage u "Version" (Text.pack $ ("5chbot " ++ showVersion P.version))) (from msg)
+execute cfg msg (Echo echoMsg) = void $ replyMessage msg echoMsg
+execute cfg msg Version = void $ replyMessage msg (Text.pack $ ("5chbot " ++ showVersion P.version))
 execute cfg msg Unsubscribe = case from msg of
   Nothing -> return ()
   Just (Username u) -> do
@@ -66,7 +64,7 @@ execute cfg msg Unsubscribe = case from msg of
       ans = case c of
         ExitFailure _ -> "Failed to unsubscribe. Try again later or contact subreddit moderators!"
         ExitSuccess -> "You have been unsubscribed!"
-    sendMessage (Username u) "Unsubscribe" ans
+    void $ replyMessage msg ans
 execute _ _ _ = return ()
 
 broadcast :: (Monad m, MonadIO m) => [Username] -> Text.Text -> Text.Text -> RedditT m ()
