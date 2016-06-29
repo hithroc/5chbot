@@ -10,15 +10,16 @@ import Data.Monoid
 import Data.Foldable
 import Data.Maybe
 import Control.Concurrent
+import System.Process
+import System.Exit
+import System.Directory
 import qualified Data.Text as Text
 import qualified Data.Text.IO as Text
 import qualified Paths_5chbot as P
 import Data.Version (showVersion)
-import Bot.Csv
 import Bot.Parse
 import Bot.Util
 import Bot.Config
-import Bot.Drive
 
 parseMessage :: Message -> Maybe Command
 parseMessage msg = eitherToMaybe $ parse pCommand "" (body msg)
@@ -33,29 +34,39 @@ sendError cfg msg txt = case from msg of
   Nothing -> return ()
   Just u -> do
     let
-      ans = body msg
+      ans = "### Request"
+          <>"\n\n>" <> body msg
           <>"\n\n-------------------\n\n"
           <>txt
     sendMessage u "Command error!" ans
 
 execute :: (Monad m, MonadIO m) => Config -> Message -> Command -> RedditT m ()
 execute cfg msg (Broadcast bcastMsg) = authorize cfg msg $ do
-  tok <- liftIO $ initDrive (cfgGoogleId cfg) (cfgGoogleSecret cfg) "data/gcache"
-  res <- liftIO $ downloadSpreadsheet tok (cfgMaillistId cfg)
-  case res of
-    Left e -> sendError cfg msg (Text.pack . show $ e)
-    Right b -> do
-      muser <- liftIO $ loadUsers b
-      case muser of
-        Nothing -> sendError cfg msg "Mailing list parse error!"
-        Just users -> do
-          liftIO $ print users
-          broadcast (map Username users) (subject msg) bcastMsg
+  let script = "/scripts/spreadsheet_wrapper.py"
+  path <- liftIO $ ((++script) <$> getCurrentDirectory)
+  (c, ret, _) <- liftIO $ readCreateProcessWithExitCode (proc path [Text.unpack $ cfgMaillistId cfg, "get_subs"]) ""
+
+  case c of
+    ExitFailure _ -> sendError cfg msg "Failed to fetch mailing list!"
+    ExitSuccess -> do
+      let users = map (Username . Text.pack) . lines $ ret
+      broadcast users (subject msg) bcastMsg
 
 execute cfg msg (ErrorTest errMsg) = authorize cfg msg $ sendError cfg msg errMsg
 
 execute cfg msg (Echo echoMsg) = maybe (return ()) (\u -> sendMessage u (subject msg) echoMsg) (from msg)
-execute cfg msg (Version) = maybe (return ()) (\u -> sendMessage u "Version" (Text.pack $ ("5chbot " ++ showVersion P.version))) (from msg)
+execute cfg msg Version = maybe (return ()) (\u -> sendMessage u "Version" (Text.pack $ ("5chbot " ++ showVersion P.version))) (from msg)
+execute cfg msg Unsubscribe = case from msg of
+  Nothing -> return ()
+  Just (Username u) -> do
+    let script = "/scripts/spreadsheet_wrapper.py"
+    path <- liftIO $ ((++script) <$> getCurrentDirectory)
+    (c, ret, _) <- liftIO $ readCreateProcessWithExitCode (proc path [Text.unpack $ cfgMaillistId cfg, "unsubscribe", Text.unpack u]) ""
+    let
+      ans = case c of
+        ExitFailure _ -> "Failed to unsubscribe. Try again later or contact subreddit moderators!"
+        ExitSuccess -> "You have been unsubscribed!"
+    sendMessage (Username u) "Unsubscribe" ans
 execute _ _ _ = return ()
 
 broadcast :: (Monad m, MonadIO m) => [Username] -> Text.Text -> Text.Text -> RedditT m ()

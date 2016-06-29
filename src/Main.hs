@@ -9,9 +9,9 @@ import qualified Data.Text as Text
 import qualified Data.Text.IO as Text
 import Bot.Config
 import Bot.Reddit
-import Bot.Drive
 import qualified Data.ByteString.Lazy.Char8 as BS
 import System.Directory
+import System.Process
 
 main :: IO ()
 main = do
@@ -20,7 +20,6 @@ main = do
   case mcfg of
     Nothing -> putStrLn "Error: Failed to open config.json!"
     Just cfg -> do
-      _ <- initDrive (cfgGoogleId cfg) (cfgGoogleSecret cfg) "data/gcache"
       res <- runReddit (cfgUsername cfg) (cfgPassword cfg) (redditMain cfg)
       print res
 

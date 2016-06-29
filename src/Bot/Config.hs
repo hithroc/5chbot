@@ -9,8 +9,6 @@ import qualified Data.ByteString.Lazy as BS
 data Config = Config
   { cfgUsername :: Text.Text
   , cfgPassword :: Text.Text
-  , cfgGoogleId :: String
-  , cfgGoogleSecret :: String
   , cfgMaillistId :: Text.Text
   , cfgModerators :: [Text.Text]
   }
@@ -20,8 +18,6 @@ instance FromJSON Config where
   parseJSON (Object v) = Config 
     <$> v .: "username"
     <*> v .: "password"
-    <*> v .: "google_client_id"
-    <*> v .: "google_client_secret"
     <*> v .: "google_maillist_id"
     <*> v .: "moderators"
 

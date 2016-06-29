@@ -11,6 +11,7 @@ data Command
   | Echo Text.Text
   | ErrorTest Text.Text
   | Version
+  | Unsubscribe
   | Help
   deriving Show
 
@@ -21,6 +22,7 @@ commands = map (\(x,y) -> (try . pStr $ x , y))
   ,("error", ErrorTest <$> pContent)
   ,("version", return Version)
   ,("help", return Help)
+  ,("unsubscribe", return Unsubscribe)
   ]
   where
     pStr x = do
