@@ -40,3 +40,88 @@ email in the JSON file.
 And then run the project:
 
     $ stack exec 5chbot
+
+Or look at the list of available command-line arguments
+
+    $ stack exec 5chbot -- -h
+
+Keep in mind, that all command-line should go after `stack exec 5chbot --`.
+
+## Using the bot
+
+Using the bot is mostly done by sending a reddit PM to it with the command
+you want to execute. All commands start with `!` and followed with the name of
+the command. For example `!unsubscribe`.
+Here's the list and description of all the available commands. Commands that
+are marked with `[M]` can be executed only by the moderators. If someone
+tries to execute such command, and they're not a moderator, the command will
+do nothing, and [the incident will be reported](https://xkcd.com/838/).
+
+### [M] Broadcast
+
+This command fetches the Google Spreadsheet with all the users, that subscribed
+to recieve broadcast messages. Then it sends a private message to everyone in
+the list. The title of the broadcasting message will be the title of your
+message with the request, and the body of the message will be everything you put
+after `!broadcast` in you request message. For example:
+
+Message title: `Hello world!`
+
+Message body:
+
+    !broadcast Hiya
+
+Broadcast title: `Hello world!
+
+Broadcast body:
+
+    Hiya
+
+If something bad happens and the broadcast fails (for example, the bot failed
+to fetch mailing list for some reason), the error message will be sent as a
+reply to your request.
+
+### Echo
+
+Echo command is very simple. It's just replies to you with the message you've
+sent. For example:
+
+Message title: `Echoes!`
+
+Message body:
+
+    !echo Wooooo!
+
+Reply body:
+
+    Wooooo!
+
+### Version
+
+Replies with the current version of the bot. For example:
+
+Message title: `Any title`
+Message body:
+
+    !version
+
+Reply body:
+
+    5chbot ver 1.0.1
+
+### Unsubscribe
+
+Unsubscribes you from the mailing list.
+
+Message title: `Any title`
+Message body:
+
+    !unsubscribe
+
+Reply body if unsubscribing succedes:
+
+    You have been unsubscribed!
+
+Reply body if something bad happens:
+
+    Failed to unsubscribe. Try again later or contact subreddit moderators!
