@@ -52,10 +52,11 @@ Keep in mind, that all command-line should go after `stack exec 5chbot --`.
 Using the bot is mostly done by sending a reddit PM to it with the command
 you want to execute. All commands start with `!` and followed with the name of
 the command. For example `!unsubscribe`.
-Here's the list and description of all the available commands. Commands that
-are marked with `[M]` can be executed only by the moderators. If someone
-tries to execute such command, and they're not a moderator, the command will
-do nothing, and [the incident will be reported](https://xkcd.com/838/).
+
+Here's a list of all the available commands. Commands that are marked with `[M]`
+can only be executed by a moderator. If someone tries to execute such command,
+and they're not a moderator, the command will do nothing, and
+[the incident will be reported](https://xkcd.com/838/).
 
 ### [M] Broadcast
 
@@ -71,7 +72,7 @@ Message body:
 
     !broadcast Hiya
 
-Broadcast title: `Hello world!
+Broadcast title: `Hello world!`
 
 Broadcast body:
 
@@ -96,6 +97,9 @@ Reply body:
 
     Wooooo!
 
+This command will be probably be removed at some point, it's main purpose is
+to check if bot is working or not.
+
 ### Version
 
 Replies with the current version of the bot. For example:
@@ -118,7 +122,7 @@ Message body:
 
     !unsubscribe
 
-Reply body if unsubscribing succedes:
+Reply body if the operation succeedes:
 
     You have been unsubscribed!
 
