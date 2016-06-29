@@ -4,3 +4,4 @@ google.json
 dist
 *.csv
 data
+*.log
