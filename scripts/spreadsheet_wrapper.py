@@ -44,6 +44,6 @@ if __name__ == "__main__":
   try:
     main()
   except:
-    print ("Unexpected error:", sys.exc_info()[0])
+    print ("Unexpected error:", sys.exc_info()[0], file=sys.stderr)
     sys.exit(1)
   sys.exit(0)
