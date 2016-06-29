@@ -36,7 +36,7 @@ options =
   [ Option ['h'] ["help"]     (NoArg PrintHelp)       "Print this message"
   , Option ['D'] ["daemon"]   (NoArg DaemonMode)      "Run the program in daemon mode"
   , Option []    ["version"]  (NoArg PrintVersion)    "Print program's version"
-  , Option []    ["log-file"] (ReqArg LogFile "FILE") "Log file. Default is stdout"
+  , Option []    ["log-file"] (ReqArg LogFile "FILE") "Log file. Default is stdout or 5chbot.log in daemon mode"
   ]
 
 compilerOpts :: [String] -> IO ([Flag], [String])
