@@ -15,6 +15,14 @@ data Command
   | Help
   deriving Show
 
+cmdName :: Command -> String
+cmdName (Broadcast _) = "broadcast"
+cmdName (Echo _) = "echo"
+cmdName (ErrorTest _) = "error_test"
+cmdName Version = "version"
+cmdName Unsubscribe = "unsubscribe"
+cmdName Help = "help"
+
 commands :: [(Parser (), Parser Command)]
 commands = map (\(x,y) -> (try . pStr $ x , y))
   [("broadcast", Broadcast <$> pContent)
