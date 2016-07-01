@@ -10,15 +10,13 @@ import Data.Monoid
 import Data.Foldable
 import Data.Maybe
 import Control.Concurrent
-import System.Process
-import System.Exit
-import System.Directory
 import qualified Data.Text as Text
 import qualified Data.Text.IO as Text
 import System.Log.Logger
 import Bot.Parse
 import Bot.Util
 import Bot.Config
+import Bot.Script
 import Settings
 
 parseMessage :: Message -> Maybe Command
@@ -50,16 +48,13 @@ sendError cfg msg txt = do
 execute :: (Monad m, MonadIO m) => Config -> Message -> Command -> RedditT m ()
 execute cfg msg (Broadcast bcastMsg) = authorize cfg msg $ do
   liftIO $ infoM rootLoggerName "Fetching mailing list..."
-  let script = "/scripts/spreadsheet_wrapper.py"
-  path <- liftIO $ ((++script) <$> getCurrentDirectory)
-  (c, out, err) <- liftIO $ readCreateProcessWithExitCode (proc path [Text.unpack $ cfgMaillistId cfg, "get_subs"]) ""
-
-  case c of
-    ExitFailure _ -> do
+  ret <- liftIO $ wrapperScript cfg ["get_subs"]
+  case ret of
+    Left err -> do
       let errMessage = "Failed to fetch mailing list!\n" ++ err
       liftIO $ errorM rootLoggerName (errMessage)
       sendError cfg msg (Text.pack errMessage)
-    ExitSuccess -> do
+    Right out -> do
       let users = map (Username . Text.pack) . lines $ out
       broadcast users (subject msg) bcastMsg
 
@@ -70,14 +65,12 @@ execute cfg msg Version = void $ replyMessage msg (Text.pack $ showVersion)
 execute cfg msg Unsubscribe = case from msg of
   Nothing -> return ()
   Just (Username u) -> do
-    let script = "/scripts/spreadsheet_wrapper.py"
-    path <- liftIO $ ((++script) <$> getCurrentDirectory)
-    (c, _, err) <- liftIO $ readCreateProcessWithExitCode (proc path [Text.unpack $ cfgMaillistId cfg, "unsubscribe", Text.unpack u]) ""
-    ans <- case c of
-        ExitFailure _ -> do
+    ret <- liftIO $ wrapperScript cfg ["unsubscribe", Text.unpack u]
+    ans <- case ret of
+        Left err -> do
           liftIO $ warningM rootLoggerName $ "Failed to unsubscribe " ++ show u ++ ": " ++ err
           return "Failed to unsubscribe. Try again later or contact subreddit moderators!"
-        ExitSuccess -> return "You have been unsubscribed!"
+        Right out -> return "You have been unsubscribed!"
     void $ replyMessage msg ans
 execute _ _ _ = return ()
 

@@ -17,6 +17,7 @@ executable 5chbot
   main-is:             Main.hs
   other-modules:       Bot.Core
                        Bot.Config
+                       Bot.Script
                        Bot.Parse
                        Bot.Util
                        Settings
