@@ -9,6 +9,7 @@ import Control.Monad.IO.Class
 import Data.Monoid
 import Data.Foldable
 import Data.Maybe
+import Data.List
 import Control.Concurrent
 import qualified Data.Text as Text
 import qualified Data.Text.IO as Text
@@ -26,9 +27,9 @@ authorize :: (Monad m, MonadIO m) => Config -> Message -> RedditT m () -> Reddit
 authorize cfg msg m = do
   mods <- redditGetMods cfg
   if maybe False (`elem` mods) (from msg)
-  then m 
+  then m
   else do
-    liftIO $ noticeM rootLoggerName $ "Unauthorized request from " 
+    liftIO $ noticeM rootLoggerName $ "Unauthorized request from "
                                     ++ show (from msg)
                                     ++ "! Message body: \""
                                     ++ Text.unpack (body msg) ++ "\""
@@ -55,7 +56,7 @@ execute cfg msg (Broadcast bcastMsg) = authorize cfg msg $ do
       liftIO $ errorM rootLoggerName (errMessage)
       sendError cfg msg (Text.pack errMessage)
     Right out -> do
-      let users = map (Username . Text.pack) . lines $ out
+      let users = nub . map (Username . Text.pack) . lines $ out
       broadcast users (subject msg) bcastMsg
 
 execute cfg msg (ErrorTest errMsg) = authorize cfg msg $ sendError cfg msg errMsg
