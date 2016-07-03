@@ -32,7 +32,10 @@ def main():
   credentials = ServiceAccountCredentials.from_json_keyfile_name('google.json', scope)
   gc = gspread.authorize(credentials)
 
+  # Open the first sheet of the spreadsheet
   wks = gc.open_by_key(sys.argv[1]).sheet1
+
+  # Parse command line arguments
   if sys.argv[2] == "unsubscribe":
     unsub(wks, sys.argv[3])
   elif sys.argv[2] == "get_subs":
