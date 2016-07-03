@@ -60,6 +60,7 @@ go cfg = do
   res <- runReddit (cfgUsername cfg) (cfgPassword cfg) (redditMain cfg)
   case res of
     Left e -> do
-      criticalM rootLoggerName (show e)
-      exitFailure
+      errorM rootLoggerName (show e)
+      infoM rootLoggerName "Restarting the bot..."
+      go cfg
     _ -> return ()
