@@ -76,7 +76,10 @@ execute cfg msg Unsubscribe = case from msg of
 execute _ _ _ = return ()
 
 broadcast :: (Monad m, MonadIO m) => [Username] -> Text.Text -> Text.Text -> RedditT m ()
-broadcast users subject message = traverse_ (\u -> sendMessage u subject message) users
+broadcast users subject message = traverse_ (\u -> sendMessage u subject (message<>botdec)) users
+  where
+    botdec = Text.pack . ("\n\n"++) . unwords . map ("^^"++) . words $ botrem
+    botrem = "I am a bot. If you want to unsubscribe from the broadcast messages reply with \"!unsubscribe\""
 
 redditMain :: (Monad m, MonadIO m) => Config -> RedditT m ()
 redditMain cfg = do
