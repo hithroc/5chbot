@@ -13,6 +13,7 @@ import Data.List
 import Control.Concurrent
 import qualified Data.Text as Text
 import qualified Data.Text.IO as Text
+import Control.Applicative
 import System.Log.Logger
 import Bot.Parse
 import Bot.Util
@@ -76,10 +77,16 @@ execute cfg msg Unsubscribe = case from msg of
 execute _ _ _ = return ()
 
 broadcast :: (Monad m, MonadIO m) => [Username] -> Text.Text -> Text.Text -> RedditT m ()
-broadcast users subject message = traverse_ (\u -> sendMessage u subject (message<>botdec)) users
+broadcast users subject message = traverse_ f users
   where
     botdec = Text.pack . ("\n\n"++) . unwords . map ("^^"++) . words $ botrem
     botrem = "I am a bot. If you want to unsubscribe from the broadcast messages reply with \"!unsubscribe\""
+    f :: (Monad m, MonadIO m) => Username -> RedditT m ()
+    f u = do
+      re <- nest $ sendMessage u subject (message<>botdec)
+      case re of
+        Right _ -> return ()
+        Left (APIError e) -> liftIO . noticeM rootLoggerName $ "Broadcast sendmessage exception: " ++ show e
 
 redditMain :: (Monad m, MonadIO m) => Config -> RedditT m ()
 redditMain cfg = do
