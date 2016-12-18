@@ -6,11 +6,14 @@ import Text.Parsec (parse)
 import Text.Parsec.Text
 import Control.Monad
 import Control.Monad.IO.Class
+import Data.Aeson
+import qualified Data.Map as M
 import Data.Monoid
 import Data.Foldable
 import Data.Maybe
 import Data.List
 import Control.Concurrent
+import qualified Network.Wreq as W
 import qualified Data.Text as Text
 import qualified Data.Text.IO as Text
 import Control.Applicative
@@ -20,6 +23,21 @@ import Bot.Util
 import Bot.Config
 import Bot.Script
 import Settings
+import Control.Exception
+
+sendWebhook :: Config -> Text.Text -> IO ()
+sendWebhook cfg msg = do
+  let
+    m :: M.Map Text.Text Text.Text 
+    m = M.fromList [("content", msg)]
+  case cfgDiscordWebHook cfg of
+    Just hook -> do
+      er <- try $ W.post (Text.unpack hook) (toJSON m)
+      case er of
+        Left (SomeException e) -> print e
+        Right _ -> return ()
+    Nothing -> return ()
+  
 
 parseMessage :: Message -> Maybe Command
 parseMessage msg = eitherToMaybe $ parse pCommand "" (body msg)
@@ -58,6 +76,7 @@ execute cfg msg (Broadcast bcastMsg) = authorize cfg msg $ do
       sendError cfg msg (Text.pack errMessage)
     Right out -> do
       let users = nub . map (Username . Text.pack) . lines $ out
+      liftIO $ sendWebhook cfg bcastMsg
       broadcast users (subject msg) bcastMsg
 
 execute cfg msg (ErrorTest errMsg) = authorize cfg msg $ sendError cfg msg errMsg
@@ -77,7 +96,8 @@ execute cfg msg Unsubscribe = case from msg of
 execute _ _ _ = return ()
 
 broadcast :: (Monad m, MonadIO m) => [Username] -> Text.Text -> Text.Text -> RedditT m ()
-broadcast users subject message = traverse_ f users
+broadcast users subject message = do
+  traverse_ f users
   where
     botdec = Text.pack . ("\n\n"++) . unwords . map ("^^"++) . words $ botrem
     botrem = "I am a bot. If you want to unsubscribe from the broadcast messages reply with \"!unsubscribe\""

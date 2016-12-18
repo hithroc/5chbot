@@ -34,6 +34,8 @@ executable 5chbot
                       ,hslogger     == 1.2.*
                       ,hdaemonize   == 0.5.*
                       ,unix         == 2.7.*
+                      ,containers
+                      ,wreq
   default-extensions:  ConstraintKinds
                        DataKinds
                        DefaultSignatures

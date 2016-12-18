@@ -11,6 +11,7 @@ data Config = Config
   , cfgPassword :: Text.Text
   , cfgMaillistId :: Text.Text
   , cfgModerators :: [Text.Text]
+  , cfgDiscordWebHook :: Maybe Text.Text
   }
   deriving Show
 
@@ -20,6 +21,7 @@ instance FromJSON Config where
     <*> v .: "password"
     <*> v .: "google_maillist_id"
     <*> v .: "moderators"
+    <*> v .:? "discord_hook"
 
 
 loadConfig :: FilePath -> IO (Maybe Config)
