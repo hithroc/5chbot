@@ -28,7 +28,7 @@ import Control.Exception
 sendWebhook :: Config -> Text.Text -> IO ()
 sendWebhook cfg msg = do
   let
-    m :: M.Map Text.Text Text.Text 
+    m :: M.Map Text.Text Text.Text
     m = M.fromList [("content", msg)]
   case cfgDiscordWebHook cfg of
     Just hook -> do
@@ -37,7 +37,6 @@ sendWebhook cfg msg = do
         Left (SomeException e) -> print e
         Right _ -> return ()
     Nothing -> return ()
-  
 
 parseMessage :: Message -> Maybe Command
 parseMessage msg = eitherToMaybe $ parse pCommand "" (body msg)
@@ -103,6 +102,7 @@ broadcast users subject message = do
     botrem = "I am a bot. If you want to unsubscribe from the broadcast messages reply with \"!unsubscribe\""
     f :: (Monad m, MonadIO m) => Username -> RedditT m ()
     f u = do
+      liftIO . infoM rootLoggerName $ "Sending a message to " ++ show u
       re <- nest $ sendMessage u subject (message<>botdec)
       case re of
         Right _ -> return ()
