@@ -10,7 +10,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 def unsub(wks, username):
   try:
     # Find all the cells, where username is mentioned
-    exp = re.compile(username, "i")
+    exp = re.compile(username, re.I)
     cells = wks.findall(exp)
   except gspread.exceptions.CellNotFound:
     # If there's no cells with the username, then there's no need to do anything
