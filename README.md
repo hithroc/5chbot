@@ -16,8 +16,8 @@ downloads and builds all the dependencies.
 
 ## Runtime Dependenices
 
-The project uses Python script as a wrapper for Google Spreadsheet API. You
-need Python 3 installed and [gspread](https://pypi.python.org/pypi/gspread)
+The project uses a python script as a wrapper for Google Spreadsheet API. You
+need Python 3+, [gspread](https://pypi.python.org/pypi/gspread)
 and [oauth2client](https://pypi.python.org/pypi/oauth2client) Python packages.
 You can install them using PyPy:
 
@@ -26,18 +26,18 @@ You can install them using PyPy:
 
 ## Running
 
-To run the project you need to copy the example config file and fill the login
-information there and mailing list spreadsheet ID there:
+To run the bot you need to copy the example config file, fill the login
+information and mailing list spreadsheet ID there:
 
     $ cp config.json.example config.json
 
 You also need to create a new project in [Google Developers Console](https://console.developers.google.com/project),
 enable Drive API for it. Then create a new service account key and download it
-as JSON file. Save it as "google.json" in the root directory of the project.
+as JSON file. Save it as "google.json" in the root directory of the bot.
 Then you should share the mailing list spreadsheet with the service account
 email in the JSON file.
 
-And then run the project:
+Now you can just run it:
 
     $ stack exec 5chbot
 
@@ -49,18 +49,18 @@ Keep in mind, that all command-line should go after `stack exec 5chbot --`.
 
 ## Using the bot
 
-Using the bot is mostly done by sending a reddit PM to it with the command
+The bot is mostly used by sending a reddit PM to it with the command
 you want to execute. All commands start with `!` and followed with the name of
 the command. For example `!unsubscribe`.
 
 Here's a list of all the available commands. Commands that are marked with `[M]`
-can only be executed by a moderator. If someone tries to execute such command,
-and they're not a moderator, the command will do nothing, and
-[the incident will be reported](https://xkcd.com/838/).
+can only be executed by a moderator (moderator users are specified by config
+file). If someone tries to execute such command, and they're not a moderator,
+the command will do nothing, and [the incident will be reported](https://xkcd.com/838/).
 
 ### [M] Broadcast
 
-This command fetches the Google Spreadsheet with all the users, that subscribed
+This command fetches the Google Spreadsheet with all the users, that are subscribed
 to recieve broadcast messages. Then it sends a private message to everyone in
 the list. The title of the broadcasting message will be the title of your
 message with the request, and the body of the message will be everything you put
@@ -98,7 +98,7 @@ Reply body:
     Wooooo!
 
 This command will be probably be removed at some point, it's main purpose is
-to check if bot is working or not.
+to check if the bot is working or not.
 
 ### Version
 
