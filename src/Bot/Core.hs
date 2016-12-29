@@ -106,7 +106,7 @@ broadcast users subject message = do
       re <- nest $ sendMessage u subject (message<>botdec)
       case re of
         Right _ -> return ()
-        Left (APIError e) -> liftIO . noticeM rootLoggerName $ "Broadcast sendmessage exception: " ++ show e
+        Left (APIError e) -> liftIO . noticeM rootLoggerName $ "Broadcast sendmessage exception for " ++ show u ++ ": " ++ show e
 
 redditMain :: (Monad m, MonadIO m) => Config -> RedditT m ()
 redditMain cfg = do
